@@ -11,4 +11,5 @@ f.readFile(argv, 'utf-8', function (error, data) {
   } else {
     console.log(data);
   }
-});
+}
+) ;
