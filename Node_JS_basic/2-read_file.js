@@ -1,35 +1,42 @@
-/* eslint-disable comma-dangle */
 const fs = require('fs');
 
-const countStudents = (path) => {
+function countStudents(path) {
   try {
-    const content = fs.readFileSync(path, 'utf8');
-    const lines = content.split(/\r?\n/);
-    const headers = lines[0].split(',');
+    const data = fs.readFileSync(path, 'utf8').split('\n');
+    while (data[data.length - 1] === '') {
+      data.pop();
+    }
+    const students = data.map((line) => line.split(','));
+    console.log((`Number of students: ${students.length - 1}`));
     const fields = {};
+    students.forEach((student) => {
+      const [firstname, , , field] = student;
+      if (!fields[field]) {
+        fields[field] = {
+          count: 0,
+          list: [],
+        };
+      }
+      fields[field].count += 1;
+      fields[field].list.push(firstname);
+    });
 
-    for (let i = 1; i < lines.length; i += 1) {
-      const data = lines[i].split(',');
-      if (data.length === headers.length) {
-        const [firstname, , , field] = data;
+    const f = [];
 
-        if (!fields[field]) {
-          fields[field] = [];
-        }
-        fields[field].push(firstname);
+    for (const field in fields) {
+      if (Object.prototype.hasOwnProperty.call(fields, field)) {
+        f.push(field);
       }
     }
-    console.log(`Number of students: ${lines.length - 1}`);
-    for (const key in fields) {
-      if (Object.prototype.hasOwnProperty.call(fields, key)) {
-        console.log(
-          `Number of students in ${key}: ${fields[key].length}. List: ${fields[key].join(', ')}`
-        );
+    f.shift();
+
+    for (const field in f) {
+      if (Object.prototype.hasOwnProperty.call(f, field)) {
+        console.log(`Number of students in ${f[field]}: ${fields[f[field]].list.length}. List: ${fields[f[field]].list.join(', ')}`);
       }
     }
-  } catch (err) {
+  } catch (error) {
     throw new Error('Cannot load the database');
   }
-};
-
+}
 module.exports = countStudents;
